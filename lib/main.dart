@@ -67,7 +67,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hyper Pay',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: Container(),
+      home: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _getPaymentResponse(),
+        ),
+      ),
     );
   }
 }
