@@ -19,19 +19,20 @@ import Flutter
               result(FlutterMethodNotImplemented)
               return
           }
-          self.recivePayment(result: result, call: call)
+          self.receivePayment(result: result, call: call)
       })
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
     
-    private func recivePayment(result: @escaping FlutterResult, call: FlutterMethodCall){
+    private func receivePayment(result: @escaping FlutterResult, call: FlutterMethodCall){
         let provider = OPPPaymentProvider(mode: OPPProviderMode.test)
         let checkoutSettings = OPPCheckoutSettings()
         // Set available payment brands for your shop
-        checkoutSettings.paymentBrands = ["VISA",  "DIRECTDEBIT_SEPA", "MASTER"]
+        checkoutSettings.paymentBrands = ["VISA",  "DIRECTDEBIT_SEPA", "MASTER", "MADA"]
         // Set shopper result URL
-        checkoutSettings.shopperResultURL = "com.fadyfawzy.hyperpay_example.payments://result"
+        // Must be not invalid URL
+        checkoutSettings.shopperResultURL = "com.fadyfawzy.hyperpay.payments://result"
         
         let args = call.arguments as? Dictionary<String, Any>
         let checkoutId = (args?["checkoutId"] as? String)!
@@ -42,7 +43,7 @@ import Flutter
             guard let transaction = transaction else {
                 // Handle invalid transaction,
                 result(FlutterError(code: "UNAVAILABLE ELSE",
-                                    message: "Payemt info unavailable",
+                                    message: "Payment info unavailable",
                                     details: nil))
                 return
             }

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
 
       return _checkoutID;
     } catch (e) {
-      print('Failed to get payment method: $e.');
+      debugPrint('Failed to get payment method: $e.');
       rethrow;
     }
   }
@@ -55,9 +55,9 @@ class MyApp extends StatelessWidget {
           await platform.invokeMethod('getPaymentMethod', <String, dynamic>{
         'checkoutId': checkoutId,
       });
-      print(result);
+      debugPrint(result);
     } on PlatformException catch (e) {
-      print("Failed to get payment method: '${e.message}'.");
+      debugPrint("Failed to get payment method: '${e.message}'.");
     }
   }
 
