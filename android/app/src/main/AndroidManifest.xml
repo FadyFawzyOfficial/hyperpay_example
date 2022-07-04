@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.fadyfawzy.hyperpay_example">
+    
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
    <application
         android:label="hyperpay_example"
         android:name="${applicationName}"
@@ -25,6 +29,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- If you want to use prebuilt checkout declare the CheckoutActivity -->
+        <!-- NOTE: Make sure you set the tools:replace="android:theme" attribute for the CheckoutActivity.
+        It belongs to the Android tools namespace, so you must first declare this namespace in the
+        <manifest>element: xmlns:tools="http://schemas.android.com/tools". 
+        Also if you use your custom style it must extend the Theme.Checkout style. -->
+        <activity
+            tools:replace="android:theme"
+            android:name="com.oppwa.mobile.connect.checkout.dialog.CheckoutActivity"
+            android:theme="@style/Theme.Checkout.Light"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="false"
+            android:launchMode="singleTop"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
