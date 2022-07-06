@@ -14,7 +14,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.fadyfawzy/paymentMethod"
-    private lateinit var result: MethodChannel.Result
+    private lateinit var _result: MethodChannel.Result
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(
@@ -24,9 +24,9 @@ class MainActivity : FlutterActivity() {
             // This method is invoked on the main thread.
             // TODO
             if (call.method.equals("getPaymentMethod")) {
-                this.result = result
+                _result = result
                 receivePayment(call)
-            } else this.result.notImplemented()
+            } else result.notImplemented()
         }
     }
 
@@ -45,21 +45,21 @@ class MainActivity : FlutterActivity() {
 
                 if (transaction.transactionType == TransactionType.SYNC) {
                     /* check the result of synchronous transaction */
-                    result.success(transaction.alipaySignedOrderInfo)
+                    _result.success(transaction.alipaySignedOrderInfo)
                 } else {
                     /* wait for the asynchronous transaction callback in the onNewIntent() */
-                    result.success(transaction.alipaySignedOrderInfo)
+                    _result.success(transaction.redirectUrl)
                 }
             }
 
             CheckoutActivity.RESULT_CANCELED -> {
                 /* shopper cancelled the checkout process */
-                result.error("UNAVAILABLE", "shopper canceled the checkout process", null)
+                _result.error("UNAVAILABLE", "shopper canceled the checkout process", null)
             }
 
             CheckoutActivity.RESULT_ERROR -> {
                 /* error occurred */
-                result.error("UNAVAILABLE", CheckoutActivity.CHECKOUT_RESULT_ERROR, null)
+                _result.error("UNAVAILABLE", CheckoutActivity.CHECKOUT_RESULT_ERROR, null)
                 val error: PaymentError =
                     data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_ERROR)!!
             }
@@ -76,7 +76,7 @@ class MainActivity : FlutterActivity() {
         )
 
         // Set shopper result URL
-        checkoutSetting.shopperResultUrl = "om.fadyfawzy.hyperpay_example.payments://result"
+        checkoutSetting.shopperResultUrl = "com.fadyfawzy.hyperpay.payments://result"
 
         val intent = checkoutSetting.createCheckoutActivityIntent(this)
 
