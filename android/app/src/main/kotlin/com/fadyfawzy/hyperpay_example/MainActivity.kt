@@ -1,5 +1,6 @@
 package com.fadyfawzy.hyperpay_example
 
+import com.oppwa.mobile.connect.checkout.dialog.CheckoutActivity
 import com.oppwa.mobile.connect.checkout.meta.CheckoutSettings
 import com.oppwa.mobile.connect.provider.Connect
 import io.flutter.embedding.android.FlutterActivity
@@ -24,5 +25,9 @@ class MainActivity: FlutterActivity() {
 
         // Set shopper result URL
         checkoutSetting.setShopperResultUrl("om.fadyfawzy.hyperpay_example.payments://result")
+
+        val intent = checkoutSetting.createCheckoutActivityIntent(this)
+
+        startActivityForResult(intent, CheckoutActivity.REQUEST_CODE_CHECKOUT)
     }
 }
