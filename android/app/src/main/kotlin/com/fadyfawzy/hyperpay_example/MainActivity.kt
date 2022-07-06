@@ -1,8 +1,12 @@
 package com.fadyfawzy.hyperpay_example
 
+import android.content.Intent
 import com.oppwa.mobile.connect.checkout.dialog.CheckoutActivity
 import com.oppwa.mobile.connect.checkout.meta.CheckoutSettings
+import com.oppwa.mobile.connect.exception.PaymentError
 import com.oppwa.mobile.connect.provider.Connect
+import com.oppwa.mobile.connect.provider.Transaction
+import com.oppwa.mobile.connect.provider.TransactionType
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
@@ -10,11 +14,46 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.fadyfawzy/paymentMethod"
+    private val result: MethodChannel.Result? = null
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             // This method is invoked on the main thread.
             // TODO
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(resultCode){
+            CheckoutActivity.RESULT_OK -> {
+                // transaction completed
+                val transaction: Transaction = data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_TRANSACTION)!!
+
+                // resource path if needed
+                val resourcePath = data.getStringExtra(CheckoutActivity.CHECKOUT_RESULT_RESOURCE_PATH)
+
+                if(transaction.transactionType == TransactionType.SYNC){
+                    /* check the result of synchronous transaction */
+                    result!!.success(transaction.alipaySignedOrderInfo)
+                }
+                else{
+                    /* wait for the asynchronous transaction callback in the onNewIntent() */
+                    result!!.success(transaction.alipaySignedOrderInfo)
+                }
+            }
+
+            CheckoutActivity.RESULT_CANCELED -> {
+                /* shopper cancelled the checkout process */
+                result!!.error("UNAVAILABLE", "shopper canceled the checkout process", null)
+            }
+
+            CheckoutActivity.RESULT_ERROR -> {
+                /* error occurred */
+                result!!.error("UNAVAILABLE", CheckoutActivity.CHECKOUT_RESULT_ERROR, null)
+                val error: PaymentError = data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_ERROR)!!
+            }
         }
     }
 
