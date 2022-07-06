@@ -12,38 +12,41 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.fadyfawzy/paymentMethod"
     private lateinit var result: MethodChannel.Result
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            CHANNEL
+        ).setMethodCallHandler { call, result ->
             // This method is invoked on the main thread.
             // TODO
-            if (call.method.equals("getPaymentMethod")){
+            if (call.method.equals("getPaymentMethod")) {
                 this.result = result
                 receivePayment(call)
-            }
-            else this.result.notImplemented()
+            } else this.result.notImplemented()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when(resultCode){
+        when (resultCode) {
             CheckoutActivity.RESULT_OK -> {
                 // transaction completed
-                val transaction: Transaction = data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_TRANSACTION)!!
+                val transaction: Transaction =
+                    data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_TRANSACTION)!!
 
                 // resource path if needed
-                val resourcePath = data.getStringExtra(CheckoutActivity.CHECKOUT_RESULT_RESOURCE_PATH)
+                val resourcePath =
+                    data.getStringExtra(CheckoutActivity.CHECKOUT_RESULT_RESOURCE_PATH)
 
-                if(transaction.transactionType == TransactionType.SYNC){
+                if (transaction.transactionType == TransactionType.SYNC) {
                     /* check the result of synchronous transaction */
                     result.success(transaction.alipaySignedOrderInfo)
-                }
-                else{
+                } else {
                     /* wait for the asynchronous transaction callback in the onNewIntent() */
                     result.success(transaction.alipaySignedOrderInfo)
                 }
@@ -57,15 +60,20 @@ class MainActivity: FlutterActivity() {
             CheckoutActivity.RESULT_ERROR -> {
                 /* error occurred */
                 result.error("UNAVAILABLE", CheckoutActivity.CHECKOUT_RESULT_ERROR, null)
-                val error: PaymentError = data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_ERROR)!!
+                val error: PaymentError =
+                    data!!.getParcelableExtra(CheckoutActivity.CHECKOUT_RESULT_ERROR)!!
             }
         }
     }
 
-    private fun receivePayment(call: MethodCall){
+    private fun receivePayment(call: MethodCall) {
         val paymentBrands = hashSetOf("VISA", "MASTER", "DIRECTDEBIT_SEPA")
 
-        val checkoutSetting = CheckoutSettings(call.argument("checkoutId")!!, paymentBrands, Connect.ProviderMode.TEST)
+        val checkoutSetting = CheckoutSettings(
+            call.argument("checkoutId")!!,
+            paymentBrands,
+            Connect.ProviderMode.TEST
+        )
 
         // Set shopper result URL
         checkoutSetting.shopperResultUrl = "om.fadyfawzy.hyperpay_example.payments://result"
